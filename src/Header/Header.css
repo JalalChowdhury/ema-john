@@ -1,0 +1,26 @@
+.logo{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 100px;
+    margin-top: 10px;
+   
+    /* width: 30%; */
+}
+/* Nav Style */
+nav{
+    background-color: black;
+    line-height: 70px;
+    text-align: center;
+}
+nav a{
+    text-decoration: none;
+    padding: 10px;
+    margin-right: 10px;
+    font-size: 30px;
+    color: rgb(231, 162, 34);
+}
+nav a:hover{
+    background-color: lightgray;
+    border-radius: 5px;
+}
