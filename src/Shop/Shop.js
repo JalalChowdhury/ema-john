@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import {addToDb, getStoredCart} from  "../utilities/fakedb"
 
 import Cart from '../Cart/Cart';
 
 
 import './Shop.css'
+import Rating from 'react-rating';
 
 
 const Shop = () => {
@@ -13,42 +15,95 @@ const Shop = () => {
     const [products,setProducts] = useState([]);
     const [cart,setCart] = useState([]);
 
+
+    const [displayProducts, setDisplayProducts] = useState([]);
+
     useEffect(()=>{
         fetch("./products.JSON")
            .then(res => res.json())
-           .then(data => setProducts(data));
+           .then(data => {
+               setProducts(data)
+               setDisplayProducts(data);
+               
+           });
+               
+           
     },[])
+    //2nd part
+    useEffect(() =>{
+
+       if(products.length){
+
+            const saveCart =getStoredCart();
+            const storedCart = [];
+            for(const key in saveCart){
+                const addedProduct = products.find(product => product.key === key);
+                if(addedProduct){
+                    const quantity = saveCart[key];
+                    addedProduct.quantity = quantity ;
+                    storedCart.push(addedProduct);
+                }
+            }
+            setCart(storedCart);
+       }
+    },[products])
 
     const handleAddToCart = (product) =>{
         const newCart = [...cart,product];
         setCart(newCart);
+        // 2nd part for local storage added
+        addToDb(product.key);
     }
 
-    return (
-        <div className="shop-container">
-            <div className="product-container">
+    const handleSearch = event =>{
+        const searchText = event.target.value;
+        // console.log(searchText);
+        const matchedProducts = products.filter(product => product.name.toLowerCase().includes(searchText.toLowerCase()));
+        setDisplayProducts(matchedProducts);
+        console.log(matchedProducts.length);
+    }
 
-                   
-                    {
-                         products.map(product => <Products
-                            key = {product.key}
-                            product = {product}
-                            handleAddToCart = {handleAddToCart}
-                         
-                         ></Products> )
+    // Return shop related
+
+    return (
+        <div>
+            <div className="search-container">
+
+                    <input type="text" onChange={handleSearch} name="" id="" placeholder="search a product name ..."/>
+            </div>
+            <div className="shop-container">
+                <div className="product-container">
 
                     
-                    }
-            </div>
-            <div className="cart-container">
-                   <Cart
-                        cart = {cart}
-                   ></Cart>
-            </div>
+                        {
+                            //  products.map replace  displayProducts.map
+                            displayProducts.map(product => <Products
+                                key = {product.key}
+                                
+                                product = {product}
+                                handleAddToCart = {handleAddToCart}
+                            
+                            ></Products> )
+
+                        
+                        }
+                </div>
+                <div className="cart-container">
+                    <Cart
+                            cart = {cart}
+                    ></Cart>
+                </div>
             
+            </div>
         </div>
     );
 };
+
+
+
+
+
+
 
 
 
@@ -57,7 +112,7 @@ const Shop = () => {
 function Products(props){
 
     // console.log(props)
-    const {name, img ,seller ,price, stock} = props.product;
+    const {name, img ,seller ,price, stock,star} = props.product;
     const cartIcon = <FontAwesomeIcon icon={faShoppingCart} />
 
     return(
@@ -72,6 +127,12 @@ function Products(props){
                   <p><small>by : {seller}</small></p>
                   <p>Price : {price}</p>
                   <p><small>only {stock} left in stock - order soon</small></p>
+                  <Rating
+                      initialRating={star}
+                      emptySymbol="far fa-star icon-color"
+                      fullSymbol="fas fa-star icon-color"
+                      readonly
+                  ></Rating><br/>
                   <button 
                     onClick={ () => props.handleAddToCart(props.product)}
                     className="btn-regular"
