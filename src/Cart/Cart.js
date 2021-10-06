@@ -30,7 +30,7 @@ const Cart = (props) => {
             <h5>Shipping : {shipping}</h5>
             <h5>Tax : {tax}</h5>
             <h4 style={{color:"blue"}}>Grand Total : {parseFloat((total+tax+shipping).toFixed(2))}</h4>
-            <button style={{backgroundColor:"orange",border:'none',padding:'15px',fontWeight:'700',borderRadius:'8px'}}>Order</button>
+            {props.children}
         </div>
     );
 };

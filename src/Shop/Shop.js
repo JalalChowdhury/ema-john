@@ -8,6 +8,7 @@ import Cart from '../Cart/Cart';
 
 import './Shop.css'
 import Rating from 'react-rating';
+import { Link } from 'react-router-dom';
 
 
 const Shop = () => {
@@ -49,7 +50,19 @@ const Shop = () => {
     },[products])
 
     const handleAddToCart = (product) =>{
-        const newCart = [...cart,product];
+        const exists =cart.find(pd => pd.key === product.key);
+        let newCart = [];
+        if(exists){
+            const rest = cart.filter(pd=> pd.key !==product.key);
+            exists.quantity = exists.quantity + 1;
+            newCart = [...rest,product];
+
+        }
+        else{
+            product.quantity = 1;
+            newCart = [...cart,product];
+        }
+        // const newCart = [...cart,product];
         setCart(newCart);
         // 2nd part for local storage added
         addToDb(product.key);
@@ -89,9 +102,11 @@ const Shop = () => {
                         }
                 </div>
                 <div className="cart-container">
-                    <Cart
-                            cart = {cart}
-                    ></Cart>
+                    <Cart cart = {cart} >
+                        <Link to="/review">
+                            <button className="btn-regular">Review Your Order</button>
+                        </Link>
+                    </Cart>
                 </div>
             
             </div>
